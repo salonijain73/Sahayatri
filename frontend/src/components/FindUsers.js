@@ -123,8 +123,6 @@ function FindUsers() {
     };
   }, []);
 
-  // Rest of your component code...
-
   return (
     <div className="find-users-container">
       <div className="search-filters">
