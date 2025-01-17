@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/static/css/main.65c034b0.css",
+    "main.js": "/static/js/main.a855c379.js",
+    "static/js/453.009e2722.chunk.js": "/static/js/453.009e2722.chunk.js",
+    "static/media/teams-logo.svg": "/static/media/teams-logo.62d52c8e7ae631ace9a980b80815a622.svg",
+    "index.html": "/index.html",
+    "main.65c034b0.css.map": "/static/css/main.65c034b0.css.map",
+    "main.a855c379.js.map": "/static/js/main.a855c379.js.map",
+    "453.009e2722.chunk.js.map": "/static/js/453.009e2722.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.65c034b0.css",
+    "static/js/main.a855c379.js"
+  ]
+}
