@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
   transportMode: {
     type: String,
     required: true,
-    enum: ['Car', 'Bike', 'Public Transport', 'Walk']
+    enum: ['Car', 'Bike', 'Bus', 'Train', 'Metro', 'Auto', 'Public Transport', 'Walk']
   },
   gender: {
     type: String,

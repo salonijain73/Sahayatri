@@ -56,7 +56,6 @@ function Profile() {
     setSearchTerm(value);
   };
 
-
   useEffect(() => {
     fetchUser();
   }, []);
@@ -146,10 +145,10 @@ function Profile() {
   if (error) {
     return (
       <div className="find-users-container">
-      <div className="error-message" style={{ padding: '1rem', backgroundColor: '#ffebee', borderRadius: '4px', margin: '1rem' }}>
-        <h3 style={{ color: '#c62828', marginTop: 0 }}>Error</h3>
-        <p style={{ margin: 0 }}>{error}</p>
-      </div>
+        <div className="error-message" style={{ padding: '1rem', backgroundColor: '#ffebee', borderRadius: '4px', margin: '1rem' }}>
+          <h3 style={{ color: '#c62828', marginTop: 0 }}>Error</h3>
+          <p style={{ margin: 0 }}>{error}</p>
+        </div>
       </div>
     );
   }
@@ -171,14 +170,14 @@ function Profile() {
       <div className="user-card" style={{ maxWidth: '600px', margin: '2rem auto' }}>
         <div className="user-info">
           <h3>{user.name}</h3>
-          <p>
+          <div className="info-row" style={{ marginBottom: '12px' }}>
             <strong>Designation: </strong>
             <span>{user.designation}</span>
-          </p>
-          <p>
+          </div>
+          <div className="info-row" style={{ marginBottom: '12px' }}>
             <strong>Area: </strong>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ position: 'relative' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+              <div style={{ position: 'relative', marginLeft: '4px' }}>
                 <input
                   type="text"
                   placeholder="Type to search areas..."
@@ -236,20 +235,20 @@ function Profile() {
                 )}
               </div>
             </div>
-          </p>
-          <p>
+          </div>
+          <div className="info-row" style={{ marginBottom: '12px' }}>
             <strong>Address: </strong>
             <span>{user.address}</span>
-          </p>
-          <p>
+          </div>
+          <div className="info-row" style={{ marginBottom: '12px' }}>
             <strong>Phone: </strong>
             <span>{user.phone}</span>
-          </p>
-          <p>
+          </div>
+          <div className="info-row" style={{ marginBottom: '12px' }}>
             <strong>Gender: </strong>
             <span>{user.gender}</span>
-          </p>
-          <p>
+          </div>
+          <div className="info-row" style={{ marginBottom: '12px' }}>
             <strong>Transport: </strong>
             <select
               value={editableTransport}
@@ -267,15 +266,15 @@ function Profile() {
               <option value="Public Transport">Public Transport</option>
               <option value="Walk">Walk</option>
             </select>
-          </p>
-          <p>
+          </div>
+          <div className="info-row" style={{ marginBottom: '12px' }}>
             <strong>Teams Email: </strong>
             <span>{user.teamsEmail}</span>
-          </p>
+          </div>
           {saveStatus && (
-            <p className="save-status" style={{ color: saveStatus.includes('Failed') ? 'red' : 'green' }}>
+            <div className="save-status" style={{ color: saveStatus.includes('Failed') ? 'red' : 'green', marginBottom: '12px' }}>
               {saveStatus}
-            </p>
+            </div>
           )}
           <button 
             onClick={handleSave}

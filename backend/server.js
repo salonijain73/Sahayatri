@@ -13,7 +13,9 @@ app.use(express.json());
 console.log('Attempting to connect to MongoDB...');
 
 // Set mongoose debug mode to see all queries
-mongoose.set('debug', true);
+mongoose.set('debug', (collectionName, method, query, doc) => {
+  console.log(`MongoDB Query - ${collectionName}.${method}`, JSON.stringify(query), doc);
+});
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
@@ -24,6 +26,17 @@ mongoose.connect(process.env.MONGODB_URI, {
   console.log("MongoDB database connection established successfully");
   console.log("Connection URL:", process.env.MONGODB_URI.replace(/:[^:]*@/, ':****@')); // Hide password in logs
   console.log("Connection state:", mongoose.connection.readyState);
+  console.log("Database name:", mongoose.connection.name);
+  
+  // Test query to verify connection
+  const User = require('./models/user.model');
+  User.find({}).limit(1).exec()
+    .then(users => {
+      console.log('Test query successful. Sample user:', users[0]?.name);
+    })
+    .catch(err => {
+      console.error('Test query failed:', err);
+    });
   
   // List all collections
   mongoose.connection.db.listCollections().toArray((err, collections) => {

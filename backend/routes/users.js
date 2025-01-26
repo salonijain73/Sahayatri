@@ -198,6 +198,39 @@ router.put('/:id', async (req, res) => {
     // Update fields
     user.area = req.body.area;
     user.transportMode = req.body.transportMode;
+    user.address = `${req.body.area}, Mumbai`;
+    
+    // Update location coordinates based on area
+    const areaCoordinates = {
+      'Andheri': [72.8497, 19.1136],
+      'Bandra': [72.8362, 19.0596],
+      'Borivali': [72.8567, 19.2321],
+      'Chembur': [72.9005, 19.0522],
+      'Colaba': [72.8318, 18.9067],
+      'Dadar': [72.8416, 19.0178],
+      'Dharavi': [72.8556, 19.0380],
+      'Fort': [72.8347, 18.9345],
+      'Goregaon': [72.8479, 19.1663],
+      'Juhu': [72.8296, 19.1075],
+      'Kandivali': [72.8465, 19.2037],
+      'Kurla': [72.8891, 19.0864],
+      'Malad': [72.8479, 19.1871],
+      'Mulund': [72.9571, 19.1765],
+      'Powai': [72.9052, 19.1176],
+      'Santacruz': [72.8424, 19.0831],
+      'Thane': [72.9780, 19.2183],
+      'Versova': [72.8182, 19.1351],
+      'Vile Parle East': [72.8553, 19.0895],
+      'Vikhroli': [72.9346, 19.1142],
+      'Worli': [72.8182, 19.0096]
+    };
+
+    if (areaCoordinates[req.body.area]) {
+      user.location = {
+        type: 'Point',
+        coordinates: areaCoordinates[req.body.area]
+      };
+    }
 
     // Save the updated user
     const savedUser = await user.save();
@@ -220,19 +253,33 @@ router.post('/search', async (req, res) => {
     const skip = (page - 1) * limit;
 
     console.log('POST /api/users/search - Criteria:', { area, transportMode, gender, page, limit, skip });
+    console.log('Search term:', area);
     
     let query = {};
 
     const conditions = [];
 
     if (area) {
-      const searchRegex = new RegExp(area, 'i');
+      const searchTerm = area.trim();
+      console.log('Raw search term:', searchTerm);
+      
+      const searchRegex = new RegExp(searchTerm, 'i');
+      console.log('Search regex pattern:', searchRegex);
+      
       conditions.push({
-        $or: [
-          { area: { $regex: searchRegex } },
-          { name: { $regex: searchRegex } }
-        ]
+        area: { $regex: searchTerm, $options: 'i' }
       });
+      
+      console.log('Search conditions:', JSON.stringify(conditions));
+      console.log('Search term:', searchTerm);
+      
+      // Log all users in database for debugging
+      const allUsers = await User.find({});
+      console.log('All users in database:', allUsers.map(u => ({ name: u.name, area: u.area })));
+      
+      // Test direct name search
+      const directSearch = await User.find({ name: { $regex: searchTerm, $options: 'i' } });
+      console.log('Direct name search results:', directSearch.map(u => u.name));
     }
 
     if (transportMode && transportMode !== 'All') {
@@ -247,13 +294,25 @@ router.post('/search', async (req, res) => {
       query.$and = conditions;
     }
 
-    console.log('MongoDB query:', JSON.stringify(query));
+    console.log('Final MongoDB query:', JSON.stringify(query, null, 2));
     
-    const users = await User.find(query).sort({ name: 1 }).skip(skip).limit(limit);
+    // Log all users in the database
+    const allUsers = await User.find({});
+    console.log('All users in database:', allUsers.map(u => u.name));
+    
+    console.log('Final query:', JSON.stringify(query));
+    const users = await User.find(query).sort({ name: 1 }).skip(skip).limit(limit).lean();
+    console.log('Search results:', users.map(u => u.name));
     const totalUsers = await User.countDocuments(query);
     const totalPages = Math.ceil(totalUsers / limit);
 
     console.log(`Found ${users.length} users matching criteria (page ${page} of ${totalPages}, total: ${totalUsers})`);
+    console.log('Found users:', users.map(u => ({ 
+      name: u.name, 
+      area: u.area,
+      transportMode: u.transportMode,
+      gender: u.gender 
+    })));
     
     res.json({
       users,
