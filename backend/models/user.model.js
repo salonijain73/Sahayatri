@@ -1,18 +1,7 @@
 const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema;
-
-const userSchema = new Schema({
-  _id: {
-    type: Schema.Types.ObjectId,
-    auto: true
-  },
+const userSchema = new mongoose.Schema({
   name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  designation: {
     type: String,
     required: true,
     trim: true
@@ -20,10 +9,24 @@ const userSchema = new Schema({
   area: {
     type: String,
     required: true,
-    trim: true,
-    minlength: [1, 'Area cannot be empty']
+    trim: true
   },
-  address: {
+  transportMode: {
+    type: String,
+    required: true,
+    enum: ['Car', 'Bike', 'Public Transport', 'Walk']
+  },
+  gender: {
+    type: String,
+    required: true,
+    enum: ['Male', 'Female']
+  },
+  designation: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  teamsEmail: {
     type: String,
     required: true,
     trim: true
@@ -31,23 +34,9 @@ const userSchema = new Schema({
   phone: {
     type: String,
     required: true,
-    trim: true,
-    match: [/^\d{10}$/, 'Please enter a valid 10-digit phone number']
+    trim: true
   },
-  gender: {
-    type: String,
-    required: true,
-    enum: ['Male', 'Female']
-  },
-  transportMode: {
-    type: String,
-    required: true,
-    enum: {
-      values: ['Car', 'Bike', 'Public Transport', 'Walk'],
-      message: 'Invalid transport mode'
-    }
-  },
-  teamsEmail: {
+  address: {
     type: String,
     required: true,
     trim: true
@@ -60,14 +49,12 @@ const userSchema = new Schema({
     },
     coordinates: {
       type: [Number],
-      required: false
+      default: [72.8777, 19.0760] // Default coordinates for Mumbai
     }
   }
-}, {
-  timestamps: true
 });
 
-// Create a geospatial index for location-based queries
+// Create a 2dsphere index for the location field
 userSchema.index({ location: '2dsphere' });
 
 const User = mongoose.model('User', userSchema);

@@ -152,6 +152,23 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Create new user
+router.post('/', async (req, res) => {
+  try {
+    console.log('POST /api/users - Creating new user:', req.body);
+    const newUser = new User(req.body);
+    const savedUser = await newUser.save();
+    console.log('User created successfully:', savedUser);
+    res.json(savedUser);
+  } catch (err) {
+    console.error('Error creating user:', err);
+    if (err.name === 'ValidationError') {
+      return res.status(400).json('Validation Error: ' + err.message);
+    }
+    res.status(500).json('Error creating user: ' + err.message);
+  }
+});
+
 // Advanced search with multiple criteria
 // Update user
 router.put('/:id', async (req, res) => {
@@ -202,39 +219,48 @@ router.post('/search', async (req, res) => {
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    console.log('POST /api/users/search - Criteria:', { area, transportMode, gender, page, limit });
+    console.log('POST /api/users/search - Criteria:', { area, transportMode, gender, page, limit, skip });
     
     let query = {};
 
+    const conditions = [];
+
     if (area) {
-      query.area = { $regex: new RegExp(area, 'i') };
+      const searchRegex = new RegExp(area, 'i');
+      conditions.push({
+        $or: [
+          { area: { $regex: searchRegex } },
+          { name: { $regex: searchRegex } }
+        ]
+      });
     }
-    if (transportMode) {
-      query.transportMode = transportMode;
+
+    if (transportMode && transportMode !== 'All') {
+      conditions.push({ transportMode });
     }
-    if (gender) {
-      query.gender = gender;
+
+    if (gender && gender !== 'All') {
+      conditions.push({ gender });
+    }
+
+    if (conditions.length > 0) {
+      query.$and = conditions;
     }
 
     console.log('MongoDB query:', JSON.stringify(query));
     
+    const users = await User.find(query).sort({ name: 1 }).skip(skip).limit(limit);
     const totalUsers = await User.countDocuments(query);
     const totalPages = Math.ceil(totalUsers / limit);
 
-    const users = await User.find(query)
-      .skip(skip)
-      .limit(limit)
-      .sort({ name: 1 });
-
-    console.log(`Found ${users.length} users matching criteria (page ${page} of ${totalPages})`);
+    console.log(`Found ${users.length} users matching criteria (page ${page} of ${totalPages}, total: ${totalUsers})`);
     
     res.json({
       users,
       pagination: {
         currentPage: page,
         totalPages,
-        totalUsers,
-        hasMore: page < totalPages
+        totalUsers
       }
     });
   } catch (err) {
