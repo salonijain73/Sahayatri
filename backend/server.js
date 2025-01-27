@@ -20,7 +20,11 @@ mongoose.set('debug', (collectionName, method, query, doc) => {
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 5000
+  serverSelectionTimeoutMS: 30000,
+  socketTimeoutMS: 45000,
+  connectTimeoutMS: 30000,
+  retryWrites: true,
+  w: 'majority'
 })
 .then(() => {
   console.log("MongoDB database connection established successfully");
