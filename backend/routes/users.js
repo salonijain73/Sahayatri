@@ -169,7 +169,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Advanced search with multiple criteria
 // Update user
 router.put('/:id', async (req, res) => {
   try {
@@ -199,6 +198,11 @@ router.put('/:id', async (req, res) => {
     user.area = req.body.area;
     user.transportMode = req.body.transportMode;
     user.address = `${req.body.area}, Mumbai`;
+    
+    // Handle customTransportMode
+    if (req.body.customTransportMode !== undefined) {
+      user.customTransportMode = req.body.customTransportMode;
+    }
     
     // Update location coordinates based on area
     const areaCoordinates = {
@@ -245,6 +249,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// Advanced search with multiple criteria
 router.post('/search', async (req, res) => {
   try {
     const { area, transportMode, gender } = req.body;
@@ -307,15 +312,23 @@ router.post('/search', async (req, res) => {
     const totalPages = Math.ceil(totalUsers / limit);
 
     console.log(`Found ${users.length} users matching criteria (page ${page} of ${totalPages}, total: ${totalUsers})`);
-    console.log('Found users:', users.map(u => ({ 
+    
+    // Ensure customTransportMode is included in results
+    const usersWithCustomTransport = users.map(user => ({
+      ...user,
+      customTransportMode: user.customTransportMode || ''
+    }));
+    
+    console.log('Found users:', usersWithCustomTransport.map(u => ({ 
       name: u.name, 
       area: u.area,
       transportMode: u.transportMode,
+      customTransportMode: u.customTransportMode,
       gender: u.gender 
     })));
     
     res.json({
-      users,
+      users: usersWithCustomTransport,
       pagination: {
         currentPage: page,
         totalPages,

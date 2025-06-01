@@ -14,7 +14,12 @@ const userSchema = new mongoose.Schema({
   transportMode: {
     type: String,
     required: true,
-    enum: ['Car', 'Bike', 'Bus', 'Train', 'Metro', 'Auto', 'Public Transport', 'Walk']
+    enum: ['Car', 'Bike', 'Bus', 'Train', 'Metro', 'Auto', 'Local Train', 'Walk', 'Others']
+  },
+  customTransportMode: {
+    type: String,
+    required: false,
+    trim: true
   },
   gender: {
     type: String,
@@ -39,6 +44,11 @@ const userSchema = new mongoose.Schema({
   address: {
     type: String,
     required: true,
+    trim: true
+  },
+  baseOfficeLocation: {
+    type: String,
+    required: false,
     trim: true
   },
   location: {
